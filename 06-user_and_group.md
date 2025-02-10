@@ -122,6 +122,15 @@
 - su 명령과 달리, sudo 를 사용하는 경우 일반적으로 사용자가 액세스하려는 사용자 계정의 암호가 아닌 본인 암호를 입력하여 인증
 - sudo의 또 다른 이점은 기본적으로 실행된 모든 명령을 `/var/log/secure`에 기록
 - `-i` 옵션으로 계정으로 전환하고 해당 사용자의 기본 쉘(일반적으로 bash) 및 관련된 대화형 로그인 스크립트를 실행할 수 있음
+  ```bash
+   Run the shell specified by the target user's password database entry as a login shell.  This means that login-specific resource files such as .profile, .bash_profile, or .login will be read by the shell.  If a command is specified, it is passed to the shell as a simple command using the -c option.  The command and any args are concatenated, separated by spaces, after escaping each character (including white space) with a backslash (‘\’)
+   except for alphanumerics, underscores, hyphens, and dollar signs.  If no command is specified, an interactive shell is executed.  sudo attempts to change to that user's home directory before running the shell.  The command is run with an environment similar to the one a user would receive at log in.  Most shells behave differently when a command is specified as compared to an interactive session; consult the shell's manual for details.  The Command environment section in the sudoers(5) manual documents how the -i option affects the environment in which a command is run when the sudoers policy is in use.
+  ```
+  - 로그인 시 로드되는 .profile, .bash_profile, .login 등의 설정 파일이 적용됩니다.
+  - 명령어가 지정되면 -c 옵션을 사용하여 셸에서 실행되며, 명령어와 인수는 백슬래시(\)를 사용해 특수 문자와 공백을 이스케이프 처리한 후 전달됩니다.
+  - 명령어가 없으면 대상 사용자의 홈 디렉터리로 이동한 후 인터랙티브 셸을 실행합니다.
+  - Question. 그럼 너무 권한이 열려있는 거 아니냐?
+    - sudoers 로 막을 수 있음 ex. `user1 ALL=(ALL) ALL, !/usr/bin/sudo -i`
 
 | 구분 | su | su - | sudo |
 |---|---|---|---|
@@ -153,10 +162,15 @@ su: Authentication failure
   - 이 디렉토리 내의 파일들은 자동으로 sudo 설정에 포함
   - 주 설정 파일을 수정하지 않고도 새로운 sudo 규칙을 추가할 수 있음
 - 설정  
+  - `<사용자 또는 그룹> <호스트>=(<대상 사용자>) <허용 명령어>`
   - `devops ALL=(ALL) NOPASSWD:ALL`
   - devops 사용자는
   - 모든 호스트에서 (ALL=)
+    - 단일 서버에서는 보통 ALL 여러 서버에서 원격으로 실행할 경우 특정 호스트만 sudo 가능하도록 할 수 있음
+      - `user3 server1,server2=(ALL) ALL`
   - 모든 사용자로 명령을 실행할 수 있는 권한을 부여 ((ALL))
+    - 특정 user 설정 가능 
+    - `user2 ALL=(deploy) ALL`: `sudo -u deploy`만 가능
   - 비밀번호 입력 없이 (NOPASSWD:)
   - 모든 명령을 실행할 수 있음 (ALL)
 - group의 경우 "%" prefix (`%group01        ALL=(ALL)       ALL`)
