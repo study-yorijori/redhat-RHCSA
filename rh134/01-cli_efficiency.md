@@ -39,7 +39,7 @@
 ### 인용 특수 문자
 
 - Bash 쉘에서 특별한 의미를 갖는 문자와 단어가 있음
-  - 특별한 의미가 아닌 리터럴 값으로 사용하렴녀 스크립트에서 해당 문자를 이스케이프 해야 함
+  - 특별한 의미가 아닌 리터럴 값으로 사용하려면 스크립트에서 해당 문자를 이스케이프 해야 함
   - 이스케이프는 백슬래시(\\), 작은따옴표('') 또는 큰따옴표("")를 사용해 적용할 수 있음
 - 소괄호는 다른 명령을 실행하고 결과 대체함
 - 큰따옴표는 쉘 확장을 억제하는데 사용하지만 변수 대체(중괄호 구문)을 사용할 수 있음
@@ -129,9 +129,10 @@ host3
 filea
 fileb
 filec
-# rpm -qa | grep kernel: 현재 시스템에 설치된 모든 RPM 패키지 조회
+# rpm -qa | grep kernel: 현재 시스템에 설치된 모든 RPM 패키지 조회해서 kernel 문자열을 가진 패키지 조회
 # rpm -q --qf "%{INSTALLTIME}\n" $PACKAGE: 쿼리 결과를 설치 시간 필드로 포맷팅하고 유닉스 타임스탬프로 출력
 # date -d 명령어로 유닉스 타임스탬프를 human readable format으로 출력
+# $(date -d @$(rpm -q --qf "%{INSTALLTIME}\n" $PACKAGE))에서 @는 date 명령에서 유닉스 타임스탬프값을 다루기 위한 기호
 [user@host ~]$ for PACKAGE in $(rpm -qa | grep kernel); \
 do echo "$PACKAGE was installed on \
 $(date -d @$(rpm -q --qf "%{INSTALLTIME}\n" $PACKAGE))"; done
@@ -427,6 +428,10 @@ vindication
 - grep 명령은 정규 표현식을 사용해 일치하는 데이터를 격리함
 - grep 명령을 사용해 단일 파일 또는 여러 파일에서 일치하는 데이터를 찾을 수 있음
 - grep을 사용해 여러 파일에서 일치하는 데이터를 찾는 경우 파일 이름, 콜론 문자, 정규 표현식과 일치하는 행이 차례로 출력됨
+- grep 명령의 종료 코드
+  - 패턴 찾을 수 없으면 1
+  - 파일 자체가 없으면 2
+
 
 ```shell
 # /usr/share/dict/words 파일에서 computer로 시작하는 데이터 격리
@@ -552,18 +557,4 @@ ClientAliveInterval 60
 Subsystem sftp ~~
 PasswordAuthentication ~~
 ```
-
-
-
-- basic regex(BRE)
-- extend regex(ERE)
-- grep은 global regular expression print
-  - 발견되는 행을 표시하는 도구
-  - 패턴을 찾으면 종료 코드 0
-  - 패턴 찾을 수 없으면 1
-  - 파일 자체가 없으면 2
-  - 
-- awk
-  - 
-- sed
 
